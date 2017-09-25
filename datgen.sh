@@ -11,7 +11,7 @@ DATA_DIR=data_`printf %02d $SF`
 
 pushd tpcds-kit/tools
 
-if [ -d $DATA_DIR ]
+if [ -d $DATA_DIR ] && [ `ls $DATA_DIR | wc -l` == "25" ]
 then
 	echo "Data exists.  Skip."
 	exit 0
