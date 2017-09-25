@@ -20,4 +20,8 @@ fi
 mkdir $DATA_DIR
 ./dsdgen -force Y -scale $SF -dir $DATA_DIR
 
+# Convert blank cells to `\N` to be NULL in mysql rather than value zero
+# https://github.com/gregrahn/tpcds-kit/issues/13#issuecomment-127006306
+sed -i -e 's/^|/\\N|/' -e 's/||/|\\N|/g' -e 's/||/|\\N|/g' -e 's/|$/|/' $DATA_DIR/*.dat
+
 popd
