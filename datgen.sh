@@ -18,4 +18,6 @@ then
 fi
 
 mkdir $DATA_DIR
-./dsdgen -scale $SF -dir $DATA_DIR
+./dsdgen -force Y -scale $SF -dir $DATA_DIR
+
+popd
