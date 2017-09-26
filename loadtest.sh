@@ -62,7 +62,7 @@ done
 
 echo "# Create index and constraints"
 START=`msecs`
-sudo /usr/local/mysql/bin/mysql tpcds < ./tpcds_ri.sql
+$MYSQL < ./tpcds_ri.sql
 DURATION=$(( `msecs` - $START))
 SECS=`msec_to_sec $DURATION`
 
