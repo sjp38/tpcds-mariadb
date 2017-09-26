@@ -6,6 +6,9 @@ then
 	exit 1
 fi
 
+BINDIR=`dirname $0`
+pushd $BINDIR/tpcds-kit/tools
+
 SF=$1
 DATADIR=data_`printf %02d $SF`
 
@@ -15,13 +18,15 @@ then
 	exit 1
 fi
 
-BINDIR=`dirname $0`
-pushd $BINDIR
+USER=root
+MYSQL="/usr/local/mysql/bin/mysql -u $USER"
 
-pushd tpcds-kit/tools
+echo "# Create database"
+$MYSQL -e "create database tpcds"
+MYSQL="$MYSQL tpcds"
 
-sudo /usr/local/mysql/bin/mysql -e "create database tpcds"
-sudo /usr/local/mysql/bin/mysql tpcds < ./tpcds.sql
+echo "# Create tables"
+$MYSQL < ./tpcds.sql
 
 TOTAL_NSECS=0
 
@@ -32,7 +37,7 @@ do
 	t=`echo $t | sed -e "s/.dat//"`
 	f="./$DATADIR/"$f
 	START=`date +%s%N`
-	sudo /usr/local/mysql/bin/mysql tpcds -e "LOAD DATA LOCAL INFILE '$f' INTO TABLE $t FIELDS TERMINATED BY '|';"
+	$MYSQL -e "LOAD DATA LOCAL INFILE '$f' INTO TABLE $t FIELDS TERMINATED BY '|';"
 	END=`date +%s%N`
 	if [ $? -ne 0 ]
 	then
@@ -53,5 +58,4 @@ TOTAL_NSECS=$(($TOTAL_NSECS + $(($END - $START))))
 printf "Total: \t%16d nsecs\n" $TOTAL_NSECS
 
 
-popd
 popd
