@@ -1,0 +1,341 @@
+From bbeb1283b6275b4cfe6f61b0fd2bb64184d34422 Mon Sep 17 00:00:00 2001
+From: SeongJae Park <sj38.park@gmail.com>
+Date: Mon, 25 Sep 2017 20:41:11 +0900
+Subject: [PATCH] Fixes for MariaDB
+
+This commit contains change for MariaDB 10.2.8 on Ubuntu 16.04.  Lots of
+changes are came from gregrahn's repository[1].
+
+[1] https://github.com/gregrahn/tpcds-kit
+
+Signed-off-by: SeongJae Park <sj38.park@gmail.com>
+---
+ query_templates/ansi.tpl                |  2 ++
+ query_templates/db2.tpl                 |  2 ++
+ query_templates/mysql.tpl               | 39 ++++++++++++++++++++++++++
+ query_templates/netezza.tpl             |  2 ++
+ query_templates/oracle.tpl              |  2 ++
+ query_templates/sqlserver.tpl           |  2 ++
+ query_templates/templates_for_mysql.lst | 49 +++++++++++++++++++++++++++++++++
+ query_variants/query10a.tpl             | 15 +++++-----
+ query_variants/query22a.tpl             |  3 +-
+ query_variants/query35a.tpl             |  2 --
+ query_variants/query51a.tpl             |  3 +-
+ query_variants/query77a.tpl             |  3 +-
+ tools/tpcds.dst                         |  4 +--
+ tools/tpcds_ri.sql                      | 10 +++----
+ 14 files changed, 117 insertions(+), 21 deletions(-)
+ create mode 100644 query_templates/mysql.tpl
+ create mode 100644 query_templates/templates_for_mysql.lst
+
+diff --git a/query_templates/ansi.tpl b/query_templates/ansi.tpl
+index ef706b8..926ab2c 100644
+--- a/query_templates/ansi.tpl
++++ b/query_templates/ansi.tpl
+@@ -35,3 +35,5 @@
+ define __LIMITA = "";
+ define __LIMITB = "top %d";
+ define __LIMITC = "";
++define _BEGIN = "-- start query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
++define _END = "-- end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
+diff --git a/query_templates/db2.tpl b/query_templates/db2.tpl
+index c047817..455f96f 100644
+--- a/query_templates/db2.tpl
++++ b/query_templates/db2.tpl
+@@ -35,3 +35,5 @@
+ define __LIMITA = "";
+ define __LIMITB = "";
+ define __LIMITC = " fetch first %d rows only";
++define _BEGIN = "-- start query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
++define _END = "-- end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
+diff --git a/query_templates/mysql.tpl b/query_templates/mysql.tpl
+new file mode 100644
+index 0000000..0ff3ce1
+--- /dev/null
++++ b/query_templates/mysql.tpl
+@@ -0,0 +1,39 @@
++--
++-- Legal Notice 
++-- 
++-- This document and associated source code (the "Work") is a part of a 
++-- benchmark specification maintained by the TPC. 
++-- 
++-- The TPC reserves all right, title, and interest to the Work as provided 
++-- under U.S. and international laws, including without limitation all patent 
++-- and trademark rights therein. 
++-- 
++-- No Warranty 
++-- 
++-- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
++--     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
++--     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
++--     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
++--     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
++--     DUTIES OR CONDITIONS OF MERCHANTABILITY, OF FITNESS FOR A PARTICULAR 
++--     PURPOSE, OF ACCURACY OR COMPLETENESS OF RESPONSES, OF RESULTS, OF 
++--     WORKMANLIKE EFFORT, OF LACK OF VIRUSES, AND OF LACK OF NEGLIGENCE. 
++--     ALSO, THERE IS NO WARRANTY OR CONDITION OF TITLE, QUIET ENJOYMENT, 
++--     QUIET POSSESSION, CORRESPONDENCE TO DESCRIPTION OR NON-INFRINGEMENT 
++--     WITH REGARD TO THE WORK. 
++-- 1.2 IN NO EVENT WILL ANY AUTHOR OR DEVELOPER OF THE WORK BE LIABLE TO 
++--     ANY OTHER PARTY FOR ANY DAMAGES, INCLUDING BUT NOT LIMITED TO THE 
++--     COST OF PROCURING SUBSTITUTE GOODS OR SERVICES, LOST PROFITS, LOSS 
++--     OF USE, LOSS OF DATA, OR ANY INCIDENTAL, CONSEQUENTIAL, DIRECT, 
++--     INDIRECT, OR SPECIAL DAMAGES WHETHER UNDER CONTRACT, TORT, WARRANTY,
++--     OR OTHERWISE, ARISING IN ANY WAY OUT OF THIS OR ANY OTHER AGREEMENT 
++--     RELATING TO THE WORK, WHETHER OR NOT SUCH AUTHOR OR DEVELOPER HAD 
++--     ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. 
++-- 
++-- Contributors:
++-- 
++define __LIMITA = "";
++define __LIMITB = "";
++define __LIMITC = "limit %d";
++define _BEGIN = "-- start query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
++define _END = "-- end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
+diff --git a/query_templates/netezza.tpl b/query_templates/netezza.tpl
+index 75488d2..0ff3ce1 100644
+--- a/query_templates/netezza.tpl
++++ b/query_templates/netezza.tpl
+@@ -35,3 +35,5 @@
+ define __LIMITA = "";
+ define __LIMITB = "";
+ define __LIMITC = "limit %d";
++define _BEGIN = "-- start query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
++define _END = "-- end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
+diff --git a/query_templates/oracle.tpl b/query_templates/oracle.tpl
+index ea6a0f7..538d4cb 100644
+--- a/query_templates/oracle.tpl
++++ b/query_templates/oracle.tpl
+@@ -35,3 +35,5 @@
+ define __LIMITA = "select * from (";
+ define __LIMITB = "";
+ define __LIMITC = " ) where rownum <= %d";
++define _BEGIN = "-- start query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
++define _END = "-- end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
+diff --git a/query_templates/sqlserver.tpl b/query_templates/sqlserver.tpl
+index ef706b8..926ab2c 100644
+--- a/query_templates/sqlserver.tpl
++++ b/query_templates/sqlserver.tpl
+@@ -35,3 +35,5 @@
+ define __LIMITA = "";
+ define __LIMITB = "top %d";
+ define __LIMITC = "";
++define _BEGIN = "-- start query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
++define _END = "-- end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
+diff --git a/query_templates/templates_for_mysql.lst b/query_templates/templates_for_mysql.lst
+new file mode 100644
+index 0000000..2e80ad5
+--- /dev/null
++++ b/query_templates/templates_for_mysql.lst
+@@ -0,0 +1,49 @@
++query3.tpl
++query6.tpl
++query7.tpl
++query9.tpl
++query10.tpl
++query13.tpl
++query15.tpl
++query17.tpl
++query19.tpl
++query25.tpl
++query26.tpl
++query28.tpl
++query29.tpl
++query34.tpl
++query35.tpl
++query41.tpl
++query42.tpl
++query43.tpl
++query44.tpl
++query45.tpl
++query46.tpl
++query49.tpl
++query50.tpl
++query52.tpl
++query53.tpl
++query55.tpl
++query61.tpl
++query62.tpl
++query63.tpl
++query65.tpl
++query66.tpl
++query68.tpl
++query69.tpl
++query71.tpl
++query72.tpl
++query73.tpl
++query75.tpl
++query76.tpl
++query79.tpl
++query84.tpl
++query85.tpl
++query88.tpl
++query89.tpl
++query90.tpl
++query91.tpl
++query93.tpl
++query96.tpl
++query98.tpl
++query99.tpl
+diff --git a/query_variants/query10a.tpl b/query_variants/query10a.tpl
+index 525cb0d..86f5e8e 100644
+--- a/query_variants/query10a.tpl
++++ b/query_variants/query10a.tpl
+@@ -67,15 +67,17 @@
+    exists (select *
+           from (
+              select ws_bill_customer_sk as customer_sk, d_year,d_moy
+-             from web_sales, date_dim where ws_sold_date_sk = d_date_sk
+-             where d_year = [YEAR] and
++             from web_sales, date_dim
++             where ws_sold_date_sk = d_date_sk and
++                   d_year = [YEAR] and
+                    d_moy between [MONTH] and [MONTH]+3
+              union all
+              select cs_ship_customer_sk as customer_sk, d_year, d_moy
+-             from catalog_sales, date_dim where cs_sold_date_sk = d_date_sk
+-             where d_year = [YEAR] and
++             from catalog_sales, date_dim
++             where cs_sold_date_sk = d_date_sk and
++                   d_year = [YEAR] and
+                    d_moy between [MONTH] and [MONTH]+3
+-	     ) x
++            ) x
+             where c.c_customer_sk = customer_sk)
+  group by cd_gender,
+           cd_marital_status,
+@@ -95,6 +97,3 @@
+           cd_dep_college_count
+ [_LIMITC];
+  
+- 
+-
+-define _END = "";
+diff --git a/query_variants/query22a.tpl b/query_variants/query22a.tpl
+index f868315..f558581 100644
+--- a/query_variants/query22a.tpl
++++ b/query_variants/query22a.tpl
+@@ -50,7 +50,8 @@ with results as
+               and inv_item_sk=i_item_sk
+               and inv_warehouse_sk = w_warehouse_sk
+               and d_month_seq between [DMS] and [DMS] + 11
+-       group by i_product_name,i_brand,i_class,i_category),
++--       group by i_product_name,i_brand,i_class,i_category
++),
+ results_rollup as 
+ (select i_product_name, i_brand, i_class, i_category,avg(qoh) qoh 
+ from results 
+diff --git a/query_variants/query35a.tpl b/query_variants/query35a.tpl
+index 9ed3357..2b749df 100644
+--- a/query_variants/query35a.tpl
++++ b/query_variants/query35a.tpl
+@@ -98,5 +98,3 @@
+           cd_dep_college_count
+  [_LIMITC];
+  
+-
+-define _END = "";
+diff --git a/query_variants/query51a.tpl b/query_variants/query51a.tpl
+index 287ca3a..208299c 100644
+--- a/query_variants/query51a.tpl
++++ b/query_variants/query51a.tpl
+@@ -87,8 +87,7 @@ select item_sk
+ )
+ [_LIMITA] select [_LIMITB] *
+ from(
+-        select v1.item_sk, v1.d_date, v1.web_sales, v1.store_sales, max(v2.web_sales) web_cumulative, max(v2.store_sales) s
+-tore_cumulative
++        select v1.item_sk, v1.d_date, v1.web_sales, v1.store_sales, max(v2.web_sales) web_cumulative, max(v2.store_sales) store_cumulative
+         from v v1, v v2
+         where v1.item_sk = v2.item_sk and v1.rk >= v2.rk
+         group by v1.item_sk, v1.d_date, v1.web_sales, v1.store_sales
+diff --git a/query_variants/query77a.tpl b/query_variants/query77a.tpl
+index c1ad503..ebe99c0 100644
+--- a/query_variants/query77a.tpl
++++ b/query_variants/query77a.tpl
+@@ -73,7 +73,7 @@
+  group by cs_call_center_sk 
+  ), 
+  cr as
+- (select
++ (select cr_call_center_sk
+         sum(cr_return_amount) as returns,
+         sum(cr_net_loss) as profit_loss
+  from catalog_returns,
+@@ -81,6 +81,7 @@
+  where cr_returned_date_sk = d_date_sk
+        and d_date between cast('[SALES_DATE]' as date)
+                   and (cast('[SALES_DATE]' as date) +  30 )
++ group by cr_call_center_sk
+  ), 
+  ws as
+  ( select wp_web_page_sk,
+diff --git a/tools/tpcds.dst b/tools/tpcds.dst
+index c7691b7..b969e71 100644
+--- a/tools/tpcds.dst
++++ b/tools/tpcds.dst
+@@ -646,7 +646,7 @@ add ("COMOROS":1);
+ --add ("CONGO, THE DEMOCRATIC REPUBLIC OF THE":1);
+ add ("add ("COOK ISLANDS":1);
+ add ("COSTA RICA":1);
+-add ("CÔTE D'IVOIRE":1);
++add ("CÃ”TE D'IVOIRE":1);
+ add ("CROATIA":1);
+ add ("CUBA":1);
+ add ("CYPRUS":1);
+@@ -771,7 +771,7 @@ add ("POLAND":1);
+ add ("PORTUGAL":1);
+ add ("PUERTO RICO":1);
+ add ("QATAR":1);
+-add ("RÉUNION":1);
++add ("RÃ‰UNION":1);
+ add ("ROMANIA":1);
+ add ("RUSSIAN FEDERATION":1);
+ add ("RWANDA":1);
+diff --git a/tools/tpcds_ri.sql b/tools/tpcds_ri.sql
+index 8e8aca5..a7fcc8c 100644
+--- a/tools/tpcds_ri.sql
++++ b/tools/tpcds_ri.sql
+@@ -36,7 +36,7 @@
+ alter table call_center add constraint cc_d1 foreign key  (cc_closed_date_sk) references date_dim (d_date_sk);
+ alter table call_center add constraint cc_d2 foreign key  (cc_open_date_sk) references date_dim (d_date_sk);
+ alter table catalog_page add constraint cp_d1 foreign key  (cp_end_date_sk) references date_dim (d_date_sk);
+-alter table catalog_page add constraint cp_p foreign key  (cp_promo_id) references promotion (p_promo_sk);
++-- alter table catalog_page add constraint cp_p foreign key  (cp_promo_id) references promotion (p_promo_sk);
+ alter table catalog_page add constraint cp_d2 foreign key  (cp_start_date_sk) references date_dim (d_date_sk);
+ alter table catalog_returns add constraint cr_cc foreign key  (cr_call_center_sk) references call_center (cc_call_center_sk);
+ alter table catalog_returns add constraint cr_cp foreign key  (cr_catalog_page_sk) references catalog_page (cp_catalog_page_sk);
+@@ -47,12 +47,12 @@ alter table catalog_returns add constraint cr_cd1 foreign key  (cr_refunded_cdem
+ alter table catalog_returns add constraint cr_c1 foreign key  (cr_refunded_customer_sk) references customer (c_customer_sk);
+ alter table catalog_returns add constraint cr_hd1 foreign key  (cr_refunded_hdemo_sk) references household_demographics (hd_demo_sk);
+ alter table catalog_returns add constraint cr_d1 foreign key  (cr_returned_date_sk) references date_dim (d_date_sk);
+-alter table catalog_returns add constraint cr_i foreign key  (cr_returned_time_sk) references time_dim (t_time_sk);
++alter table catalog_returns add constraint cr_t foreign key  (cr_returned_time_sk) references time_dim (t_time_sk);
+ alter table catalog_returns add constraint cr_a2 foreign key  (cr_returning_addr_sk) references customer_address (ca_address_sk);
+ alter table catalog_returns add constraint cr_cd2 foreign key  (cr_returning_cdemo_sk) references customer_demographics (cd_demo_sk);
+ alter table catalog_returns add constraint cr_c2 foreign key  (cr_returning_customer_sk) references customer (c_customer_sk);
+ alter table catalog_returns add constraint cr_hd2 foreign key  (cr_returning_hdemo_sk) references household_demographics (hd_demo_sk);
+-alter table catalog_returns add constraint cr_d2 foreign key  (cr_ship_date_sk) references date_dim (d_date_sk);
++-- alter table catalog_returns add constraint cr_d2 foreign key  (cr_ship_date_sk) references date_dim (d_date_sk);
+ alter table catalog_returns add constraint cr_sm foreign key  (cr_ship_mode_sk) references ship_mode (sm_ship_mode_sk);
+ alter table catalog_returns add constraint cr_w2 foreign key  (cr_warehouse_sk) references warehouse (w_warehouse_sk);
+ alter table catalog_sales add constraint cs_b_a foreign key  (cs_bill_addr_sk) references customer_address (ca_address_sk);
+@@ -116,12 +116,12 @@ alter table web_returns add constraint wr_ret_t foreign key  (wr_returned_time_s
+ alter table web_returns add constraint wr_ret_a foreign key  (wr_returning_addr_sk) references customer_address (ca_address_sk);
+ alter table web_returns add constraint wr_ret_cd foreign key  (wr_returning_cdemo_sk) references customer_demographics (cd_demo_sk);
+ alter table web_returns add constraint wr_ret_c foreign key  (wr_returning_customer_sk) references customer (c_customer_sk);
+-alter table web_returns add constraint wr_ret_cd foreign key  (wr_returning_hdemo_sk) references household_demographics (hd_demo_sk);
++alter table web_returns add constraint wr_ret_hd foreign key  (wr_returning_hdemo_sk) references household_demographics (hd_demo_sk);
+ alter table web_returns add constraint wr_wp foreign key  (wr_web_page_sk) references web_page (wp_web_page_sk);
+ alter table web_sales add constraint ws_b_a foreign key  (ws_bill_addr_sk) references customer_address (ca_address_sk);
+ alter table web_sales add constraint ws_b_cd foreign key  (ws_bill_cdemo_sk) references customer_demographics (cd_demo_sk);
+ alter table web_sales add constraint ws_b_c foreign key  (ws_bill_customer_sk) references customer (c_customer_sk);
+-alter table web_sales add constraint ws_b_cd foreign key  (ws_bill_hdemo_sk) references household_demographics (hd_demo_sk);
++alter table web_sales add constraint ws_b_hd foreign key  (ws_bill_hdemo_sk) references household_demographics (hd_demo_sk);
+ alter table web_sales add constraint ws_i foreign key  (ws_item_sk) references item (i_item_sk);
+ alter table web_sales add constraint ws_p foreign key  (ws_promo_sk) references promotion (p_promo_sk);
+ alter table web_sales add constraint ws_s_a foreign key  (ws_ship_addr_sk) references customer_address (ca_address_sk);
+-- 
+2.14.0
+
