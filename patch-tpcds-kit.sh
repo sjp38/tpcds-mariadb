@@ -13,7 +13,7 @@ then
 fi
 
 pushd $TPCDSKIT
-patch -p1 < ../for-ubuntu16.04.patch
+patch -p1 < ../for-mariadb.patch
 popd
 
 popd
