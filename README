@@ -24,7 +24,7 @@ Limitations
 
 TPC-DS has 99 queries for performance test.  However, some queries use SQL
 keywords that MariaDB doesn't support.  Our tools just ignore such queries on
-power test.  As a result, we use only 50 queries for power test.
+power test.  As a result, we use only 49 queries for power test.
 
 
 Quick Start

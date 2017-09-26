@@ -35,7 +35,7 @@ MYSQL="$MYSQL tpcds"
 
 TOTAL_MSECONDS=0
 # We use only 50 queries
-for q in {1..50}
+for q in {1..49}
 do
 	START=`msecs`
 	./runquery.sh $q > /dev/null
