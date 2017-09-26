@@ -15,18 +15,20 @@ pushd $BINDIR/tpcds-kit/tools
 bak_dir=queries_`printf %02d $SF`
 out_dir=queries
 
-mkdir -p queries_`printf %02d $SF`
-mkdir $out_dir
+mkdir -p $bak_dir
+mkdir -p $out_dir
 ./dsqgen -directory ../query_templates/ \
 	-input ../query_templates/templates_for_mysql.lst \
 	-verbose y -scale $SF -output_dir ./$bak_dir/ -dialect mysql
 
-awk -v prefix="$bak_dir/query_" 'BEGIN {RS=";\n"} {print > (prefix NR ".sql")}' $bak_dir/query_0.sql
+awk -v prefix="$bak_dir/query-" \
+	'BEGIN {RS=";\n"} {print > (prefix NR ".sql")}' \
+	$bak_dir/query_0.sql
 
 for i in {1..9}
 do
-	mv $bak_dir/query_$i.sql $bak_dir/query-`printf %02d $i`.sql
-	cp $bak_dir/*.sql $out_dir/
+	mv $bak_dir/query-$i.sql $bak_dir/query-`printf %02d $i`.sql
 done
+cp $bak_dir/*.sql $out_dir/
 
 popd
