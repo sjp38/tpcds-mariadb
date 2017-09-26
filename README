@@ -2,7 +2,7 @@ Toolbox for TPC-DS on MariaDB
 =============================
 
 This repository is a toolbox for TPC-DS benchmark[1] execution on MariaDB.  The
-tools help modifying, building, and running TPC-H kit source code for MariaDB.
+tools help modifying, building, and running TPC-DS kit source code for MariaDB.
 
 
 Pre-requisites
