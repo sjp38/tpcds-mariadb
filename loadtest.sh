@@ -18,6 +18,17 @@ then
 	exit 1
 fi
 
+function msecs() {
+	echo $((`date +%s%N` / 1000000))
+}
+
+function msec_to_sec() {
+	MSECS=$1
+	SECS=$(($MSECS / 1000))
+	MSECS=$(($MSECS - $SECS * 1000))
+	printf %d.%03d $SECS $MSECS
+}
+
 USER=root
 MYSQL="/usr/local/mysql/bin/mysql -u $USER"
 
@@ -28,7 +39,7 @@ MYSQL="$MYSQL tpcds"
 echo "# Create tables"
 $MYSQL < ./tpcds.sql
 
-TOTAL_NSECS=0
+TOTAL_MSECS=0
 
 echo "# Load data into table"
 for f in `ls $DATADIR`
@@ -36,26 +47,29 @@ do
 	t=`echo $f | sed -e "s/_[0-9]_[0-9]//"`
 	t=`echo $t | sed -e "s/.dat//"`
 	f="./$DATADIR/"$f
-	START=`date +%s%N`
+	START=`msecs`
 	$MYSQL -e "LOAD DATA LOCAL INFILE '$f' INTO TABLE $t FIELDS TERMINATED BY '|';"
-	END=`date +%s%N`
+	DURATION=$(( `msecs` - $START))
+	SECS=`msec_to_sec $DURATION`
 	if [ $? -ne 0 ]
 	then
 		echo "FAIL"
 		exit 1
 	fi
-	printf "%23s: \t%16d nsecs\n" $t $(($END - $START))
-	TOTAL_NSECS=$(($TOTAL_NSECS + $(($END - $START))))
+	printf "%23s: \t%16s secs\n" $t $SECS
+	TOTAL_MSECS=$(($TOTAL_MSECS + $DURATION))
 done
 
 echo "# Create index and constraints"
-START=`date +%s%N`
+START=`msecs`
 sudo /usr/local/mysql/bin/mysql tpcds < ./tpcds_ri.sql
-END=`date +%s%N`
-printf "index: \t%16d nsecs\n" $(($END - $START))
-TOTAL_NSECS=$(($TOTAL_NSECS + $(($END - $START))))
+DURATION=$(( `msecs` - $START))
+SECS=`msec_to_sec $DURATION`
 
-printf "Total: \t%16d nsecs\n" $TOTAL_NSECS
+printf "index: \t%16s secs\n" $SECS
+TOTAL_MSECS=$(($TOTAL_MSECS + $DURATION))
+
+printf "Total: \t%16s secs\n" `msec_to_sec $TOTAL_MSECS`
 
 
 popd
