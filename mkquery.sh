@@ -23,7 +23,7 @@ awk -v prefix="$out_dir/query_" 'BEGIN {RS=";\n"} {print > (prefix NR ".sql")}' 
 
 for i in {1..9}
 do
-	mv $out_dir/query_$i.sql $out_dir/query_`printf %02d $i`.sql
+	mv $out_dir/query_$i.sql $out_dir/query-`printf %02d $i`.sql
 done
 
 popd
