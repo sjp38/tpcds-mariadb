@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -lt 2 ]
+if [ $# -lt 1 ]
 then
-	echo "Usage: $0 <scale factor> <query number> [username [password]]"
+	echo "Usage: $0 <query number> [username [password]]"
 	exit 1
 fi
 
@@ -12,13 +12,12 @@ pushd $BINDIR/tpcds-kit/tools
 
 USER=root
 
-SF=$1
-NUM_Q=$2
+NUM_Q=$1
 
-if [ $# -gt 2 ]
+if [ $# -gt 1 ]
 then
-	USER=$3
-	PASSWORD=$4
+	USER=$2
+	PASSWORD=$3
 fi
 
 MYSQL="/usr/local/mysql/bin/mysql -u $USER"
@@ -27,5 +26,5 @@ then
 	MYSQL="$MYSQL -p $PASSWORD"
 fi
 
-QPATH=queries_`printf %02d $SF`/query-`printf %02d $NUM_Q`.sql
+QPATH=queries/query-`printf %02d $NUM_Q`.sql
 $MYSQL tpcds < ./$QPATH
