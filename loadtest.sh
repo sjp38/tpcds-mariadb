@@ -1,10 +1,5 @@
 #!/bin/bash
 
-BINDIR=`dirname $0`
-pushd $BINDIR
-
-pushd tpcds-kit/tools
-
 if [ $# -ne 1 ]
 then
 	echo "Usage: $0 <scale factor>"
@@ -19,6 +14,11 @@ then
 	echo "Data at $DATADIR not found"
 	exit 1
 fi
+
+BINDIR=`dirname $0`
+pushd $BINDIR
+
+pushd tpcds-kit/tools
 
 sudo /usr/local/mysql/bin/mysql -e "create database tpcds"
 sudo /usr/local/mysql/bin/mysql tpcds < ./tpcds.sql
