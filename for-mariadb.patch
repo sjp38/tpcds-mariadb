@@ -1,4 +1,4 @@
-From bbeb1283b6275b4cfe6f61b0fd2bb64184d34422 Mon Sep 17 00:00:00 2001
+From 6fedd798a9552862beecab2e4a37f9ed7f58964c Mon Sep 17 00:00:00 2001
 From: SeongJae Park <sj38.park@gmail.com>
 Date: Mon, 25 Sep 2017 20:41:11 +0900
 Subject: [PATCH] Fixes for MariaDB
@@ -12,19 +12,19 @@ Signed-off-by: SeongJae Park <sj38.park@gmail.com>
 ---
  query_templates/ansi.tpl                |  2 ++
  query_templates/db2.tpl                 |  2 ++
- query_templates/mysql.tpl               | 39 ++++++++++++++++++++++++++
+ query_templates/mysql.tpl               | 39 +++++++++++++++++++++++++++
  query_templates/netezza.tpl             |  2 ++
  query_templates/oracle.tpl              |  2 ++
  query_templates/sqlserver.tpl           |  2 ++
- query_templates/templates_for_mysql.lst | 49 +++++++++++++++++++++++++++++++++
- query_variants/query10a.tpl             | 15 +++++-----
- query_variants/query22a.tpl             |  3 +-
+ query_templates/templates_for_mysql.lst | 48 +++++++++++++++++++++++++++++++++
+ query_variants/query10a.tpl             | 15 +++++------
+ query_variants/query22a.tpl             |  3 ++-
  query_variants/query35a.tpl             |  2 --
- query_variants/query51a.tpl             |  3 +-
- query_variants/query77a.tpl             |  3 +-
+ query_variants/query51a.tpl             |  3 +--
+ query_variants/query77a.tpl             |  3 ++-
  tools/tpcds.dst                         |  4 +--
  tools/tpcds_ri.sql                      | 10 +++----
- 14 files changed, 117 insertions(+), 21 deletions(-)
+ 14 files changed, 116 insertions(+), 21 deletions(-)
  create mode 100644 query_templates/mysql.tpl
  create mode 100644 query_templates/templates_for_mysql.lst
 
@@ -125,10 +125,10 @@ index ef706b8..926ab2c 100644
 +define _END = "-- end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
 diff --git a/query_templates/templates_for_mysql.lst b/query_templates/templates_for_mysql.lst
 new file mode 100644
-index 0000000..2e80ad5
+index 0000000..d1a7240
 --- /dev/null
 +++ b/query_templates/templates_for_mysql.lst
-@@ -0,0 +1,49 @@
+@@ -0,0 +1,48 @@
 +query3.tpl
 +query6.tpl
 +query7.tpl
@@ -176,7 +176,6 @@ index 0000000..2e80ad5
 +query91.tpl
 +query93.tpl
 +query96.tpl
-+query98.tpl
 +query99.tpl
 diff --git a/query_variants/query10a.tpl b/query_variants/query10a.tpl
 index 525cb0d..86f5e8e 100644
