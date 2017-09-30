@@ -37,6 +37,10 @@ TOTAL_MSECONDS=0
 # We use only 50 queries
 for q in {1..49}
 do
+	# Skip 4th query because it needs too long time
+	if [ $q -eq 4 ]; then
+		continue
+	fi
 	START=`msecs`
 	./runquery.sh $q > /dev/null
 	END=`msecs`
